@@ -30,10 +30,20 @@
       }
     };
 
-    drawTexture(0, 0, 256, 256);
-    drawTexture(256, 0, 256, 256);
-    drawTexture(0, 256, 256, 256);
-    drawTexture(256, 256, 256, 256);
+    const precalculateDistanceTable = (w, h, texWidth, texHeight) => {
+      const ratio = 32.0;
+
+      for (let x = 0; x < w; x++) {
+        for (let y = 0; y < h; y++) {
+          const xw = (x - w / 2.0);
+          const yh = (y - h / 2.0);
+          const distance = Math.trunc((ratio * texHeight / Math.sqrt(xw * xw + yh * yh)) % texHeight);
+          putPixel(x, y, distance, distance, distance);
+        }
+      }
+    };
+
+    precalculateDistanceTable(640, 480, 256, 256)
 
   </script>
 </body>
