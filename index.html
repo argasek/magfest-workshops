@@ -25,9 +25,17 @@
       ctx.putImageData(imageData, x, y);
     };
 
-    for (let i = 10; i < 240; i++) {
-      putPixel(i, 10, 0, 0, 0);
-    }
+    const drawTexture = (texWidth, texHeight) => {
+
+      for(y = 0; y < texHeight; y++) {
+        for(x = 0; x < texWidth; x++) {
+          const color = (x * 256 / texWidth) ^ (y * 256 / texHeight);
+          putPixel(x, y, color, color, color);
+        }
+      }
+    };
+
+    drawTexture(128, 128);
 
   </script>
 </body>
