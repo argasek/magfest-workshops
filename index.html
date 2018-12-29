@@ -17,25 +17,20 @@
     const imageData = ctx.createImageData(1, 1);
 
     const putPixel = (x, y, r, g, b, a = 255) => {
-      const d = imageData.data;
-      d[0] = r;
-      d[1] = g;
-      d[2] = b;
-      d[3] = a;
-      ctx.putImageData(imageData, x, y);
+      ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
+      ctx.fillRect( x, y, 1, 1 );
     };
 
-    const drawTexture = (texWidth, texHeight) => {
-
-      for(y = 0; y < texHeight; y++) {
-        for(x = 0; x < texWidth; x++) {
-          const color = (x * 256 / texWidth) ^ (y * 256 / texHeight);
-          putPixel(x, y, color, color, color);
+    const drawTexture = (x = 0, y = 0, texWidth, texHeight) => {
+      for (let i = y, a = 0; i < texHeight + y; i++, a++) {
+        for (let j = x, b = 0; j < texWidth + x; j++, b++) {
+          const color = (a * 256 / texWidth) ^ (b * 256 / texHeight);
+          putPixel(j, i, color, color, color);
         }
       }
     };
 
-    drawTexture(128, 128);
+    drawTexture(0, 0, 256, 256);
 
   </script>
 </body>
