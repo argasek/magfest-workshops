@@ -11,8 +11,20 @@
   <script>
     const canvas = document.getElementById('tutorial');
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'rgb(200, 0, 0)';
-    ctx.fillRect(10, 10, 50, 50);
+    const imageData = ctx.createImageData(1, 1);
+
+    const putPixel = (x, y, r, g, b, a = 255) => {
+      const d = imageData.data;
+      d[0] = r;
+      d[1] = g;
+      d[2] = b;
+      d[3] = a;
+      ctx.putImageData(imageData, x, y);
+    };
+
+    putPixel(10, 10, 0, 0, 0);
+
+
   </script>
 </body>
 </html>
