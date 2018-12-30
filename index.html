@@ -43,7 +43,27 @@
       }
     };
 
-    precalculateDistanceTable(640, 480, 256, 256)
+    function atan2Normalized(y, x) {
+      let result = Math.atan2(y, x);
+      if (result < 0) {
+        result += (2.0 * Math.PI);
+      }
+      return(result);
+    }
+
+    const precalculateAngleTable = (w, h, texWidth, texHeight) => {
+      for (let x = 0; x < w; x++) {
+        for (let y = 0; y < h; y++) {
+          const xw = (x - w / 2.0);
+          const yh = (y - h / 2.0);
+          // atan2(y,x) returns an angle in range [-π, π] for x axis and a given point
+          const angle = Math.trunc((0.5 * texWidth * (atan2Normalized(yh, xw) / Math.PI)));
+          putPixel(x, y, angle, angle, angle);
+        }
+      }
+    };
+
+    precalculateAngleTable(640, 480, 256, 256)
 
   </script>
 </body>
