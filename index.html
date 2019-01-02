@@ -36,7 +36,7 @@
       for (let i = y, a = 0; i < texHeight + y; i++, a++) {
         for (let j = x, b = 0; j < texWidth + x; j++, b++) {
           const color = (a * 256 / texWidth) ^ (b * 256 / texHeight);
-          texture[ i * screenWidth +  j] = color;
+          texture[ i * texWidth +  j] = color;
         }
       }
     };
