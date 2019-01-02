@@ -88,7 +88,7 @@
       for (let y = 0; y < screenHeight; y++) {
         for (let x = 0; x < screenWidth; x++) {
           // get the texel from the texture by using the tables, shifted with the animation values
-          const index = y * screenHeight + x;
+          const index = y * screenWidth + x;
           const tx = Math.trunc((distanceTable[index] + shiftX) % texWidth);
           const ty = Math.trunc((angleTable[index] + shiftY) % texHeight);
           const color = texture[ty * texWidth + tx];
