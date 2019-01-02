@@ -15,22 +15,33 @@
     const canvas = document.getElementById('tutorial');
     const ctx = canvas.getContext('2d');
     const imageData = ctx.createImageData(1, 1);
+    const screenWidth = 640;
+    const screenHeight = 480;
+
+    const texWidth  = 256;
+    const texHeight = 256;
+
+    let frameCount = 0;
+
+    const angleTable = new Uint8Array(screenWidth * screenHeight);
+    const distanceTable = new Uint8Array(screenWidth * screenHeight);
+    const texture = new Uint8Array(texWidth * texHeight);
 
     const putPixel = (x, y, r, g, b, a = 255) => {
       ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
       ctx.fillRect( x, y, 1, 1 );
     };
 
-    const drawTexture = (x = 0, y = 0, texWidth, texHeight) => {
+    const precalculateTexture = (x = 0, y = 0) => {
       for (let i = y, a = 0; i < texHeight + y; i++, a++) {
         for (let j = x, b = 0; j < texWidth + x; j++, b++) {
           const color = (a * 256 / texWidth) ^ (b * 256 / texHeight);
-          putPixel(j, i, color, color, color);
+          texture[ i * screenWidth +  j] = color;
         }
       }
     };
 
-    const precalculateDistanceTable = (w, h, texWidth, texHeight) => {
+    const precalculateDistanceTable = (w, h) => {
       const ratio = 32.0;
 
       for (let x = 0; x < w; x++) {
@@ -38,7 +49,7 @@
           const xw = (x - w / 2.0);
           const yh = (y - h / 2.0);
           const distance = Math.trunc((ratio * texHeight / Math.sqrt(xw * xw + yh * yh)) % texHeight);
-          putPixel(x, y, distance, distance, distance);
+          distanceTable[y*screenWidth + x] = distance;
         }
       }
     };
@@ -51,19 +62,43 @@
       return(result);
     }
 
-    const precalculateAngleTable = (w, h, texWidth, texHeight) => {
+    const precalculateAngleTable = (w, h) => {
       for (let x = 0; x < w; x++) {
         for (let y = 0; y < h; y++) {
           const xw = (x - w / 2.0);
           const yh = (y - h / 2.0);
           // atan2(y,x) returns an angle in range [-π, π] for x axis and a given point
           const angle = Math.trunc((0.5 * texWidth * (atan2Normalized(yh, xw) / Math.PI)));
-          putPixel(x, y, angle, angle, angle);
+          angleTable[y * screenWidth + x] = angle;
         }
       }
     };
 
-    precalculateAngleTable(640, 480, 256, 256)
+    precalculateTexture(0, 0);
+    precalculateAngleTable(screenWidth, screenHeight);
+    precalculateDistanceTable(screenWidth, screenHeight);
+
+    const drawTunnel = () => {
+      const xCenter = screenWidth / 2;
+      const yCenter = screenHeight / 2;
+
+      const shiftX = frameCount;
+      const shiftY = 0;
+
+      for (let y = 0; y < screenHeight; y++) {
+        for (let x = 0; x < screenWidth; x++) {
+          // get the texel from the texture by using the tables, shifted with the animation values
+          const index = y * screenHeight + x;
+          const tx = Math.trunc((distanceTable[index] + shiftX) % texWidth);
+          const ty = Math.trunc((angleTable[index] + shiftY) % texHeight);
+          const color = texture[ty * texWidth + tx];
+          putPixel(x, y, color, color, color);
+        }
+      }
+    };
+
+
+    drawTunnel();
 
   </script>
 </body>
