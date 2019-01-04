@@ -14,22 +14,31 @@
   <script>
     const canvas = document.getElementById('tutorial');
     const ctx = canvas.getContext('2d');
-    const imageData = ctx.createImageData(1, 1);
-    const screenWidth = 640;
-    const screenHeight = 480;
+    const screenWidth = canvas.width;
+    const screenHeight = canvas.height;
+    const imageData = ctx.getImageData(0, 0, screenWidth, screenHeight);
+
+    const buf = new ArrayBuffer(imageData.data.length);
+    // The Uint8ClampedArray typed array represents an array of 8-bit unsigned integers clamped to 0-255.
+    const buf8 = new Uint8ClampedArray(buf, 0, imageData.data.length);
+    // The Uint32Array typed array represents an array of 32-bit unsigned integers in the platform byte order.
+    const data = new Uint32Array(buf);
 
     const texWidth  = 256;
     const texHeight = 256;
 
     let frameCount = 0;
 
-    const angleTable = new Uint8Array(screenWidth * screenHeight);
-    const distanceTable = new Uint8Array(screenWidth * screenHeight);
-    const texture = new Uint8Array(texWidth * texHeight);
+    const angleTable = new ArrayBuffer(screenWidth * screenHeight);
+    const distanceTable = new ArrayBuffer(screenWidth * screenHeight);
+    const texture = new ArrayBuffer(texWidth * texHeight);
 
     const putPixel = (x, y, r, g, b, a = 255) => {
-      ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
-      ctx.fillRect( x, y, 1, 1 );
+      data[y * screenWidth + x] =
+        (a << 24) |	// alpha
+        (b << 16) |	// blue
+        (g <<  8) |	// green
+        r;
     };
 
     const precalculateTexture = (x = 0, y = 0) => {
@@ -95,6 +104,9 @@
           putPixel(x, y, color, color, color);
         }
       }
+
+      imageData.data.set(buf8);
+      ctx.putImageData(imageData, 0, 0);
 
       requestAnimationFrame(drawTunnel);
       frameCount++;
